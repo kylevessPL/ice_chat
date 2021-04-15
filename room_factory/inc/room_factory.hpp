@@ -1,0 +1,9 @@
+#ifndef PROJECT_ROOM_FACTORY_HPP
+#define PROJECT_ROOM_FACTORY_HPP
+
+class RoomFactory
+{
+
+};
+
+#endif //PROJECT_ROOM_FACTORY_HPP
