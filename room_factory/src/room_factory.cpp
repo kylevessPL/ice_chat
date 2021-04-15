@@ -1,1 +1,6 @@
-#include "../inc/room_factory.hpp"
+#include <room_factory.hpp>
+
+int RoomFactory::run(int argc, char **argv)
+{
+    return 0;
+}

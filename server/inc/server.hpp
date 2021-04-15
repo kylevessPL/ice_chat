@@ -1,8 +1,12 @@
 #ifndef PROJECT_SERVER_HPP
 #define PROJECT_SERVER_HPP
 
-class Server
+#include <Ice/Application.h>
+
+class Server : public Ice::Application
 {
+public:
+    int run(int argc, char **argv) override;
 
 };
 

@@ -1,8 +1,12 @@
 #ifndef PROJECT_CLIENT_HPP
 #define PROJECT_CLIENT_HPP
 
-class Client
+#include <Ice/Application.h>
+
+class Client : public Ice::Application
 {
+    public:
+        int run(int argc, char **argv) override;
 
 };
 
