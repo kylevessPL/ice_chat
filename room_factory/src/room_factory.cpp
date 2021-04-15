@@ -35,3 +35,9 @@ int RoomFactory::run(int argc, char **argv)
 
     return EXIT_SUCCESS;
 }
+
+int main(int argc, char **argv)
+{
+    RoomFactory app;
+    return app.main(argc, argv, "chat.prop");
+}

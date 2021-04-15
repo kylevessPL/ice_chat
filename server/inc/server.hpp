@@ -5,8 +5,8 @@
 
 class Server : public Ice::Application
 {
-public:
-    int run(int argc, char **argv) override;
+    public:
+        int run(int argc, char **argv) override;
 
 };
 

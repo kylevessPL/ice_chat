@@ -2,5 +2,11 @@
 
 int Client::run(int argc, char **argv)
 {
-    return 0;
+    return EXIT_SUCCESS;
+}
+
+int main(int argc, char **argv)
+{
+    Client app;
+    return app.main(argc, argv, "chat.prop");
 }
