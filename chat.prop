@@ -1,0 +1,7 @@
+# Chat properties
+# Adjust to your preferences
+
+server.port.set=49152
+roomfactory.port.set=49153
+client.port.range.min=49155
+client.port.range.max=65535

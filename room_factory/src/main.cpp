@@ -3,6 +3,6 @@
 int main(int argc, char **argv)
 {
     RoomFactory app;
-    return app.main(argc, argv);
+    return app.main(argc, argv, "chat.prop");
 }
 
