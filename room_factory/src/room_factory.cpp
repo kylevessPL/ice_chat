@@ -4,34 +4,37 @@
 
 int RoomFactory::run(int argc, char **argv)
 {
-    std::string name;
-    do
-    {
-        std::cout << "Please enter room factory name: ";
-        getline(std::cin, name);
-        if (name.empty())
-        {
-            std::cout << "Room factory name cannot be empty!" << std::endl;
-        }
-    }
-    while (name.empty());
-
     Ice::PropertiesPtr properties = communicator()->getProperties();
     int serverPort = properties->getPropertyAsIntWithDefault("server.port.set", 49152);
-    Ice::ObjectPrx proxy = communicator()->stringToProxy(&"server:default -p " [serverPort]);
+    Ice::ObjectPrx proxy = communicator()->stringToProxy("server:default -p " + std::to_string(serverPort));
     Chat::ChatServerPrx serverPrx = serverPrx.uncheckedCast(proxy);
 
     int roomFactoryPort = properties->getPropertyAsIntWithDefault("roomfactory.port.set", 49153);
     Ice::ObjectAdapterPtr adapterPtr = communicator()->createObjectAdapterWithEndpoints(
-            "room_factory",
-            &"default -p " [roomFactoryPort]);
+            "room_factory_adapter",
+            "default -p " + std::to_string(roomFactoryPort));
     Chat::ChatRoomFactoryPtr roomFactoryPtr = new ChatRoomFactoryI();
     Chat::ChatRoomFactoryPrx roomFactoryPrx = roomFactoryPrx.uncheckedCast(adapterPtr->addWithUUID(roomFactoryPtr));
     adapterPtr->activate();
-
     serverPrx->registerChatRoomFactory(roomFactoryPrx);
-    communicator()->waitForShutdown();
+
+    std::cout << "Room factory running..." << std::endl;
+    std::cout << "Enter /stop command to kill room factory" << std::endl;
+    for(;;)
+    {
+        std::string command;
+        std::cout << "$ ";
+        std::cin >> command;
+        if (command == "/stop")
+        {
+            break;
+        }
+        std::cout << "Unknown command" << std::endl;
+    }
+
     serverPrx->unregisterChatRoomFactory(roomFactoryPrx);
+    communicator()->shutdown();
+    communicator()->waitForShutdown();
 
     return EXIT_SUCCESS;
 }

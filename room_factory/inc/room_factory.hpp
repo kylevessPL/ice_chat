@@ -6,7 +6,7 @@
 class RoomFactory : public Ice::Application
 {
     public:
-        int run(int argc, char **argv) override;
+    int run(int argc, char **argv) override;
 
 };
 
