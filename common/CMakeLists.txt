@@ -9,7 +9,7 @@ set(VENDOR_DIR vendor)
 
 add_subdirectory(${VENDOR_DIR})
 
-add_library(common_lib src/ChatRoomI.cpp src/ChatRoomFactoryI.cpp src/ChatServerI.cpp src/ChatUserI.cpp)
+add_library(common_lib src/ChatRoomI.cpp src/ChatRoomFactoryI.cpp src/ChatServerI.cpp src/ChatUserI.cpp src/ConnectionUtil.cpp)
 target_include_directories(common_lib PUBLIC ${CMAKE_CURRENT_LIST_DIR}/inc)
 
 target_link_libraries(common_lib vendor_lib ${Ice_LIBRARIES} pthread)

@@ -2,6 +2,7 @@
 # Adjust to your preferences
 
 server.port.set=49152
-roomfactory.port.set=49153
-client.port.range.min=49155
+roomfactory.port.range.min=49153
+roomfactory.port.range.max=55554
+client.port.range.min=55555
 client.port.range.max=65535

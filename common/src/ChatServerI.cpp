@@ -32,14 +32,14 @@ Chat::ChatRoomPrx ChatServerI::createChatRoom(const std::string &name, const Ice
 void ChatServerI::registerChatRoomFactory(const Chat::ChatRoomFactoryPrx &factory, const Ice::Current &current)
 {
     this->roomFactoryList.push_back(factory);
-    std::cout << "New room factory registered" << std::endl;
+    std::cout << "Room factory " << Ice::identityToString(factory->ice_getIdentity()) << " registered" << std::endl;
 }
 
 void ChatServerI::unregisterChatRoomFactory(const Chat::ChatRoomFactoryPrx &factory, const Ice::Current &current)
 {
     this->roomFactoryList.erase(std::remove(this->roomFactoryList.begin(), this->roomFactoryList.end(), factory),
                                 this->roomFactoryList.end());
-    std::cout << "Room factory unregistered" << std::endl;
+    std::cout << "Room factory " << Ice::identityToString(factory->ice_getIdentity()) << " unregistered" << std::endl;
 }
 
 void ChatServerI::registerUser(const Chat::ChatUserPrx &who, const Ice::Current &current) {

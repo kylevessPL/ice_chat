@@ -13,6 +13,7 @@ int Server::run(int argc, char **argv)
     adapterPtr->add(serverPtr, Ice::stringToIdentity("server"));
     adapterPtr->activate();
 
+    std::cout << "Server running..." << std::endl;
     communicator()->waitForShutdown();
 
     return EXIT_SUCCESS;
