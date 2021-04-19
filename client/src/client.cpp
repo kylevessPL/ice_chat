@@ -126,7 +126,7 @@ void Client::listen()
         {
             break;
         }
-        else
+        else if (!command.empty())
         {
             std::cout << "Unknown command" << std::endl;
         }
@@ -170,7 +170,7 @@ void Client::leaveRoom()
     std::string name = this->chatRoomPrx->getName();
     this->chatRoomPrx->removeUser(this->userPrx);
     this->chatRoomPrx = ICE_NULLPTR;
-    std::cout << "You've left chat room " << name << std::endl;
+    std::cout << "You left chat room " << name << std::endl;
 }
 
 void Client::joinRoom(std::string &name)
@@ -191,6 +191,10 @@ void Client::joinRoom(std::string &name)
         Chat::ChatRoomPrx room = *it;
         if (room->getName() == name)
         {
+            if (this->chatRoomPrx != ICE_NULLPTR)
+            {
+                this->leaveRoom();
+            }
             room->addUser(this->userPrx);
             this->chatRoomPrx = room;
             std::cout << "You joined chat room " << name << std::endl;
@@ -241,7 +245,7 @@ void Client::sendPrivateMessage(std::string &username, std::string &message)
     }
     if (username == this->userPrx->getName())
     {
-        std::cerr << "Cannot send message to yourself, you fool!";
+        std::cerr << "Cannot send message to yourself, you fool!" << std::endl;
         return;
     }
     Chat::UserList userList = this->chatRoomPrx->getUsers();
@@ -255,7 +259,7 @@ void Client::sendPrivateMessage(std::string &username, std::string &message)
             return;
         }
     }
-    std::cerr << "User not found" << std::endl;
+    std::cerr << "User " << username << " not found" << std::endl;
 }
 
 void Client::sendMessage(std::string &message)
