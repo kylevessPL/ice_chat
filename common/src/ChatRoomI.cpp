@@ -13,14 +13,12 @@ void ChatRoomI::sendMessage(const Chat::ChatUserPrx &from, const std::string &me
 void ChatRoomI::addUser(const Chat::ChatUserPrx &who, const Ice::Current &current)
 {
     this->userList.push_back(who);
-    std::cout << "User " << who->getName() << " joined!";
 }
 
 void ChatRoomI::removeUser(const Chat::ChatUserPrx &who, const Ice::Current &current)
 {
     this->userList.erase(std::remove(this->userList.begin(), this->userList.end(), who),
                          this->userList.end());
-    std::cout << "User " << who->getName() << " left!";
 }
 
 Chat::UserList ChatRoomI::getUsers(const Ice::Current &current)

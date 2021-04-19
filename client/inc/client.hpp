@@ -24,7 +24,7 @@ class Client : public Ice::Application
         void sendMessage(std::string &message);
         void showRoomList();
         void showUserList();
-        std::vector<std::string> getCommandTokenList(std::string &command);
+        std::vector<std::string> tokenize(std::string &command);
 
 };
 

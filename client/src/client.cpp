@@ -1,5 +1,6 @@
 #include <chat.h>
 #include <client.hpp>
+#include <characters_not_allowed_exception.hpp>
 #include <ChatServerI.hpp>
 #include <ConnectionUtil.h>
 #include <ChatUserI.hpp>
@@ -56,10 +57,19 @@ void Client::registerUsername()
         {
             std::cout << "Username: ";
             std::getline(std::cin, username);
+            if (!regex_match(username, std::regex("^[a-zA-Z0-9]+$")))
+            {
+                throw CharactersNotAllowedException("Username can contain only letters or digits");
+            }
             Chat::ChatUserPtr userPtr = new ChatUserI(username);
             this->userPrx = userPrx.uncheckedCast(adapterPtr->addWithUUID(userPtr));
             this->serverPrx->registerUser(this->userPrx);
             return;
+        }
+        catch (CharactersNotAllowedException ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            continue;
         }
         catch (Chat::UsernameAlreadyRegisteredException ex)
         {
@@ -76,79 +86,62 @@ void Client::listen()
     for(;;)
     {
         std::string command;
-        std::cout << "$ ";
-        std::cin >> command;
-        std::vector<std::string> tokenList = getCommandTokenList(command);
-        command = tokenList[0];
-        if (tokenList[1].empty())
+        getline(std::cin, command);
+        std::vector<std::string> tokenList = tokenize(command);
+        command = tokenList.at(0);
+        if (command == "/help")
         {
-            if (command == "/help")
-            {
-                showHelp();
-            }
-            else if (command == "/rooms")
-            {
-                showRoomList();
-            }
-            else if (command == "/users")
-            {
-                showUserList();
-            }
-            else if (command == "/leave")
-            {
-                leaveRoom();
-            }
-            else if (command == "/quit")
-            {
-                break;
-            }
-            else
-            {
-                std::cout << "Unknown command" << std::endl;
-            }
+            showHelp();
+        }
+        else if (command == "/rooms")
+        {
+            showRoomList();
+        }
+        else if (command == "/users")
+        {
+            showUserList();
+        }
+        else if (command == "/leave")
+        {
+            leaveRoom();
+        }
+        else if (command == "/join")
+        {
+            joinRoom(tokenList[1]);
+        }
+        else if (command == "/create")
+        {
+            createRoom(tokenList[1]);
+        }
+        else if (command == "/msgprv")
+        {
+            std::vector<std::string> args = tokenize(tokenList[1]);
+            sendPrivateMessage(args[0], args[1]);
+        }
+        else if (command == "/msg")
+        {
+            sendMessage(tokenList[1]);
+        }
+        else if (command == "/quit")
+        {
+            break;
         }
         else
         {
-            if (command == "/join")
-            {
-                joinRoom(tokenList[1]);
-            }
-            else if (command == "/create")
-            {
-                createRoom(tokenList[1]);
-            }
-            else if (command == "/msgprv")
-            {
-                sendPrivateMessage(tokenList[1], tokenList[2]);
-            }
-            else if (command == "/msg")
-            {
-                sendMessage(tokenList[1]);
-            }
-            else
-            {
-                std::cout << "Unknown command" << std::endl;
-            }
+            std::cout << "Unknown command" << std::endl;
         }
-
     }
 }
 
-std::vector<std::string> Client::getCommandTokenList(std::string &command)
+std::vector<std::string> Client::tokenize(std::string &command)
 {
     command = std::regex_replace(command, std::regex("^ +| +$|( ) +"), "$1");
-    std::vector<std::string> tokenList(3);
+    std::vector<std::string> tokenList(2);
     int pos = command.find(" ");
     tokenList[0] = command.substr(0, pos);
     if (pos != std::string::npos)
     {
-        tokenList[1] = command.substr(pos);
-        pos = tokenList[1].find(" ");
-        tokenList[1] = tokenList[1].substr(pos);
-        if (pos != std::string::npos)
-        {
-            tokenList[2] = tokenList[1].substr(0, pos);
-        }
+        tokenList[1] = command.substr(pos + 1);
     }
     return tokenList;
 }
@@ -177,7 +170,7 @@ void Client::leaveRoom()
     std::string name = this->chatRoomPrx->getName();
     this->chatRoomPrx->removeUser(this->userPrx);
     this->chatRoomPrx = ICE_NULLPTR;
-    std::cout << "You've disconnected from chat room " << name << std::endl;
+    std::cout << "You've left chat room " << name << std::endl;
 }
 
 void Client::joinRoom(std::string &name)
@@ -187,7 +180,7 @@ void Client::joinRoom(std::string &name)
         std::cerr << "Chat room name not specified" << std::endl;
         return;
     }
-    if (!this->chatRoomPrx && this->chatRoomPrx->getName() == name)
+    if (this->chatRoomPrx != ICE_NULLPTR && this->chatRoomPrx->getName() == name)
     {
         std::cerr << "You are already connected to this chat room" << std::endl;
         return;
@@ -200,10 +193,11 @@ void Client::joinRoom(std::string &name)
         {
             room->addUser(this->userPrx);
             this->chatRoomPrx = room;
+            std::cout << "You joined chat room " << name << std::endl;
             return;
         }
     }
-    std::cerr << "Chat room not found";
+    std::cerr << "Chat room " << name << " not found" << std::endl;
 }
 
 void Client::createRoom(std::string &name)
@@ -216,7 +210,7 @@ void Client::createRoom(std::string &name)
     try
     {
         this->serverPrx->createChatRoom(name);
-        std::cout << "Chat room " << name << " created";
+        std::cout << "Chat room " << name << " created, join using /join " << name << " command" << std::endl;
     }
     catch (Chat::NoRoomFactoryAvailableException ex)
     {
@@ -245,6 +239,11 @@ void Client::sendPrivateMessage(std::string &username, std::string &message)
         std::cerr << "Message not specified" << std::endl;
         return;
     }
+    if (username == this->userPrx->getName())
+    {
+        std::cerr << "Cannot send message to yourself, you fool!";
+        return;
+    }
     Chat::UserList userList = this->chatRoomPrx->getUsers();
     for (auto it = std::begin(userList); it != std::end(userList); ++it)
     {
@@ -252,6 +251,7 @@ void Client::sendPrivateMessage(std::string &username, std::string &message)
         if (user->getName() == username)
         {
             user->sendPrivateMessage(this->userPrx, message);
+            std::cout << "<" << this->userPrx->getName() << "><username> " << message << std::endl;
             return;
         }
     }
@@ -297,7 +297,7 @@ void Client::showUserList()
         return;
     }
     Chat::UserList userList = this->chatRoomPrx->getUsers();
-    if (userList.empty() || userList[1] == this->userPrx)
+    if (userList.size() == 1)
     {
         std::cout << "You're alone" << std::endl;
         return;
@@ -306,12 +306,7 @@ void Client::showUserList()
     for (auto it = std::begin(userList); it != std::end(userList); ++it)
     {
         Chat::ChatUserPrx user = *it;
-        std::string name = user->getName();
-        if (name == this->userPrx->getName())
-        {
-            continue;
-        }
-        std::cout << name << std::endl;
+        std::cout << user->getName() << std::endl;
     }
 }
 
