@@ -1,6 +1,7 @@
 #include <ConnectionUtil.h>
 #include <cstdlib>
-#include <iostream>
+
+ConnectionUtil::ConnectionUtil() {}
 
 int ConnectionUtil::getRandomPort(int portMin, int portMax) {
     return portMin + rand() % (portMax - portMin);

@@ -7,6 +7,9 @@ class ConnectionUtil
 {
     public:
         static int getRandomPort(int portMin, int portMax);
+    private:
+        ConnectionUtil();
+
 };
 
 #endif //PROJECT_CONNECTIONUTIL_H

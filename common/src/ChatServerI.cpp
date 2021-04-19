@@ -25,7 +25,7 @@ Chat::ChatRoomPrx ChatServerI::createChatRoom(const std::string &name, const Ice
     Chat::ChatRoomFactoryPrx chatRoomFactoryPrx = chatRoomFactoryPrx.checkedCast(*it2);
     Chat::ChatRoomPrx chatRoomPrx = chatRoomFactoryPrx->createChatRoom(name);
     this->roomList.push_back(chatRoomPrx);
-    std::cout << "Room " << name << " created";
+    std::cout << "Room " << name << " created" << std::endl;
     return chatRoomPrx;
 }
 
@@ -42,7 +42,8 @@ void ChatServerI::unregisterChatRoomFactory(const Chat::ChatRoomFactoryPrx &fact
     std::cout << "Room factory " << Ice::identityToString(factory->ice_getIdentity()) << " unregistered" << std::endl;
 }
 
-void ChatServerI::registerUser(const Chat::ChatUserPrx &who, const Ice::Current &current) {
+void ChatServerI::registerUser(const Chat::ChatUserPrx &who, const Ice::Current &current)
+{
     std::string username = who->getName();
     auto it = std::find_if(this->registeredUserList.begin(),
                            this->registeredUserList.end(),
@@ -52,11 +53,12 @@ void ChatServerI::registerUser(const Chat::ChatUserPrx &who, const Ice::Current 
         throw Chat::UsernameAlreadyRegisteredException();
     }
     registeredUserList.push_back(who);
-    std::cout << "User " << username << " just registered";
+    std::cout << "User " << username << " registered" << std::endl;
 }
 
-void ChatServerI::unregisterUser(const Chat::ChatUserPrx &who, const Ice::Current &current) {
+void ChatServerI::unregisterUser(const Chat::ChatUserPrx &who, const Ice::Current &current)
+{
     this->registeredUserList.erase(std::remove(this->registeredUserList.begin(), this->registeredUserList.end(), who),
                          this->registeredUserList.end());
-    std::cout << "User " << who->getName() << " unregistered";
+    std::cout << "User " << who->getName() << " unregistered" << std::endl;
 }

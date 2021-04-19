@@ -32,11 +32,10 @@ Ice::ObjectAdapterPtr RoomFactory::getAdapter(int portMin, int portMax)
         int port = ConnectionUtil::getRandomPort(portMin, portMax);
         try
         {
-            Ice::ObjectAdapterPtr adapterPtr = communicator()->createObjectAdapterWithEndpoints(
+            Ice::ObjectAdapterPtr ptr = communicator()->createObjectAdapterWithEndpoints(
                     "room_factory_adapter",
                     "default -p " + std::to_string(port));
-            std::cout << "Running room factory at port " << port << std::endl;
-            return adapterPtr;
+            return ptr;
         }
         catch (Ice::SocketException ex)
         {
