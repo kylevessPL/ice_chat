@@ -251,7 +251,7 @@ void Client::sendPrivateMessage(std::string &username, std::string &message)
         if (user->getName() == username)
         {
             user->sendPrivateMessage(this->userPrx, message);
-            std::cout << "<" << this->userPrx->getName() << "><username> " << message << std::endl;
+            std::cout << "<" << this->userPrx->getName() << "><EVERYBODY> " << message << std::endl;
             return;
         }
     }
@@ -299,7 +299,7 @@ void Client::showUserList()
     Chat::UserList userList = this->chatRoomPrx->getUsers();
     if (userList.size() == 1)
     {
-        std::cout << "You're alone" << std::endl;
+        std::cout << "You're the lonely guy" << std::endl;
         return;
     }
     std::cout << "Users online:" << std::endl;
